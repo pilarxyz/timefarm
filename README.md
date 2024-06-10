@@ -35,6 +35,10 @@ Click [here](https://t.me/TimeFarmCryptoBot?start=WIOAo6rSXEZHbmDz) to join Time
 
 3. Create `token.json` files in the root directory.
 
+- Copy bearer token from your browser's in Time Farm and paste it in `token.json` file.
+
+  ![Bearer Token](https://github.com/pilarxyz/timefarm/blob/main/imagetoken.png)
+
 - `token.json` should contain your tokens:
 
   ```json
