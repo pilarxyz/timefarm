@@ -62,21 +62,21 @@ Click [here](https://t.me/TimeFarmCryptoBot?start=WIOAo6rSXEZHbmDz) to join Time
 ## Example Output
 
 ```plaintext
-[ 10:26:56 PM ] Memproses akun ke-1...
+[ 10:26:56 PM ] Processing account 1...
 [ 10:26:57 PM ] Balance: 730000.000
 [ 10:26:57 PM ] Active Farming Started At (WIB): Jun 10, 2024, 8:26 PM
 [ 10:26:57 PM ] Next Claim Time (WIB): Jun 11, 2024, 12:26 AM
-[ 10:26:57 PM ] Task Follow our CEO on X sudah dikerjakan
-[ 10:26:57 PM ] Task Follow Time Farm on X sudah dikerjakan
-[ 10:26:57 PM ] Task Subscribe to our CEO channel belum bisa claim
-[ 10:26:57 PM ] Task Follow Chrono.tech on X sudah dikerjakan
-[ 10:26:57 PM ] Task Follow LaborX on X sudah dikerjakan
-[ 10:26:57 PM ] Task Subscribe to TimeFarm channel belum bisa claim
-[ 10:26:57 PM ] Task Subscribe to TimeFarm chat belum bisa claim
-[ 10:26:57 PM ] Task Subscribe to LaborX channel sudah dikerjakan
-[ 10:26:57 PM ] Task Subscribe to Chrono.tech channel sudah dikerjakan
-[ 10:26:57 PM ] Task Subscribe to Chrono.tech on YouTube sudah dikerjakan
-[ 10:26:57 PM ] Akun ke-1 menunggu 1 jam dan 59 menit sebelum klaim...
-[ 10:27:02 PM ] Memproses akun ke-2...
+[ 10:26:57 PM ] Task Follow our CEO on X already claimed
+[ 10:26:57 PM ] Task Follow Time Farm on X already claimed
+[ 10:26:57 PM ] Task Subscribe to our CEO channel cannot be claimed yet
+[ 10:26:57 PM ] Task Follow Chrono.tech on X already claimed
+[ 10:26:57 PM ] Task Follow LaborX on X already claimed
+[ 10:26:57 PM ] Task Subscribe to TimeFarm channel cannot be claimed yet
+[ 10:26:57 PM ] Task Subscribe to TimeFarm chat cannot be claimed yet
+[ 10:26:57 PM ] Task Subscribe to LaborX channel already claimed
+[ 10:26:57 PM ] Task Subscribe to Chrono.tech channel already claimed
+[ 10:26:57 PM ] Task Subscribe to Chrono.tech on YouTube already claimed
+[ 10:26:57 PM ] Account 1 waiting 1 hour and 59 minutes before claiming...
+[ 10:27:02 PM ] Processing account 2...
 ...
 ```
