@@ -23,8 +23,8 @@ Click [here](https://t.me/TimeFarmCryptoBot?start=WIOAo6rSXEZHbmDz) to join Time
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/TimeFarmTelegramBot.git
-   cd TimeFarmTelegramBot
+   git clone https://github.com/pilarxyz/timefarm
+   cd timefarm
    ```
 
 2. Install the dependencies:
@@ -35,15 +35,24 @@ Click [here](https://t.me/TimeFarmCryptoBot?start=WIOAo6rSXEZHbmDz) to join Time
 
 3. Create `token.json` files in the root directory.
 
-   - `token.json` should contain your tokens:
+- Copy bearer token from TimeFarm and input it to `token.json` file.
 
-     ```json
-     [
-       "Bearer your_first_token",
-       "Bearer your_second_token",
-       "Bearer your_third_token"
-     ]
-     ```
+<!-- put picture -->
+
+<center>
+   <img src="https://user-images.githubusercontent.com/9143298/134760073-3b3b3b3b-1b3b-4b3b-8b3b-3b3b3b3b3b3b.png" width="500">
+</center>
+
+
+- `token.json` should contain your tokens:
+
+  ```json
+  [
+    "Bearer your_first_token",
+    "Bearer your_second_token",
+    "Bearer your_third_token"
+  ]
+  ```
 
 ## Usage
 
