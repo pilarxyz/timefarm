@@ -51,27 +51,37 @@ const getFarmingInfo = async (token) => {
     );
     const { balance, activeFarmingStartedAt, farmingDurationInSec } =
       response.data;
-    const activeFarmingStartedWIB = DateTime.fromISO(activeFarmingStartedAt)
-      .setZone("Asia/Jakarta")
-      .toLocaleString(DateTime.DATETIME_MED);
-    const nextClaimTime = DateTime.fromISO(activeFarmingStartedAt)
-      .plus({ seconds: farmingDurationInSec + 10 })
-      .setZone("Asia/Jakarta")
-      .toLocaleString(DateTime.DATETIME_MED);
+    const activeFarmingStartedWIB = activeFarmingStartedAt
+      ? DateTime.fromISO(activeFarmingStartedAt)
+          .setZone("Asia/Jakarta")
+          .toLocaleString(DateTime.DATETIME_MED)
+      : null;
+    const nextClaimTime = activeFarmingStartedAt
+      ? DateTime.fromISO(activeFarmingStartedAt)
+          .plus({ seconds: farmingDurationInSec + 10 })
+          .setZone("Asia/Jakarta")
+          .toLocaleString(DateTime.DATETIME_MED)
+      : null;
     console.log(chalk.green(`${getTimestamp()} Balance: ${balance}`));
-    console.log(
-      chalk.green(
-        `${getTimestamp()} Active Farming Started At (WIB): ${activeFarmingStartedWIB}`
-      )
-    );
-    console.log(
-      chalk.green(`${getTimestamp()} Next Claim Time (WIB): ${nextClaimTime}`)
-    );
+    if (activeFarmingStartedWIB) {
+      console.log(
+        chalk.green(
+          `${getTimestamp()} Active Farming Started At (WIB): ${activeFarmingStartedWIB}`
+        )
+      );
+      console.log(
+        chalk.green(`${getTimestamp()} Next Claim Time (WIB): ${nextClaimTime}`)
+      );
+    } else {
+      console.log(
+        chalk.green(`${getTimestamp()} Farming has not started yet`)
+      );
+    }
     return { activeFarmingStartedAt, farmingDurationInSec };
   } catch (error) {
     console.log(
       chalk.red(
-        `${getTimestamp()} Error saat mendapatkan farming info:`,
+        `${getTimestamp()} Error getting farming info:`,
         error.message
       )
     );
@@ -91,22 +101,48 @@ const claimReward = async (token, index) => {
     const response = await axios(config);
     if (response.status === 200) {
       console.log(
-        chalk.green(`${getTimestamp()} Akun ke-${index + 1} Berhasil claim`)
+        chalk.green(`${getTimestamp()} Account ${index + 1} successfully claimed`)
       );
     }
   } catch (error) {
     if (error.response && error.response.status === 403) {
       console.log(
-        chalk.yellow(`${getTimestamp()} Akun ke-${index + 1} Belum waktu claim`)
+        chalk.yellow(`${getTimestamp()} Account ${index + 1} not time to claim yet`)
       );
     } else {
       console.log(
         chalk.red(
-          `${getTimestamp()} Akun ke-${index + 1} Error:`,
+          `${getTimestamp()} Account ${index + 1} Error:`,
           error.message
         )
       );
     }
+  }
+  console.log(chalk.blue("------------------------------"));
+};
+
+const finishFarming = async (token, index) => {
+  const config = {
+    method: "post",
+    url: "https://tg-bot-tap.laborx.io/api/v1/farming/finish",
+    headers: getHeaders(token),
+    data: {},
+  };
+
+  try {
+    const response = await axios(config);
+    if (response.status === 200) {
+      console.log(
+        chalk.green(`${getTimestamp()} Account ${index + 1} successfully finished farming`)
+      );
+    }
+  } catch (error) {
+    console.log(
+      chalk.red(
+        `${getTimestamp()} Account ${index + 1} Error finishing farming:`,
+        error.message
+      )
+    );
   }
   console.log(chalk.blue("------------------------------"));
 };
@@ -132,12 +168,12 @@ const processTasks = async (token, index) => {
           }
         );
         console.log(
-          chalk.green(`${getTimestamp()} Berhasil submit task ${task.title}`)
+          chalk.green(`${getTimestamp()} Successfully submitted task ${task.title}`)
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else if (task.submission.status === "SUBMITTED") {
         console.log(
-          chalk.yellow(`${getTimestamp()} Task ${task.title} belum bisa claim`)
+          chalk.yellow(`${getTimestamp()} Task ${task.title} cannot be claimed yet`)
         );
       } else if (task.submission.status === "COMPLETED") {
         await axios.post(
@@ -148,12 +184,12 @@ const processTasks = async (token, index) => {
           }
         );
         console.log(
-          chalk.green(`${getTimestamp()} Berhasil claim task ${task.title}`)
+          chalk.green(`${getTimestamp()} Successfully claimed task ${task.title}`)
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else if (task.submission.status === "CLAIMED") {
         console.log(
-          chalk.blue(`${getTimestamp()} Task ${task.title} sudah dikerjakan`)
+          chalk.blue(`${getTimestamp()} Task ${task.title} already claimed`)
         );
       }
 
@@ -164,12 +200,12 @@ const processTasks = async (token, index) => {
 
     if (allClaimed) {
       console.log(
-        chalk.green(`${getTimestamp()} Seluruh Tasks sudah dikerjakan`)
+        chalk.green(`${getTimestamp()} All tasks have been completed`)
       );
     }
   } catch (error) {
     console.log(
-      chalk.red(`${getTimestamp()} Error saat memproses tasks:`, error.message)
+      chalk.red(`${getTimestamp()} Error processing tasks:`, error.message)
     );
   }
 };
@@ -195,31 +231,38 @@ const updateConvertedTokens = (token, farmingInfo) => {
 const runAccount = async (token, index) => {
   console.log(`-----------------------------`);
   console.log(
-    chalk.blue(`${getTimestamp()} Memproses akun ke-${index + 1}...`)
+    chalk.blue(`${getTimestamp()} Processing account ${index + 1}...`)
   );
   const farmingInfo = await getFarmingInfo(token);
 
   if (farmingInfo) {
-    updateConvertedTokens(token, farmingInfo);
+    if (farmingInfo.activeFarmingStartedAt) {
+      updateConvertedTokens(token, farmingInfo);
 
-    await processTasks(token, index);
+      await processTasks(token, index);
 
-    const { activeFarmingStartedAt, farmingDurationInSec } = farmingInfo;
-    const nextClaimTime = DateTime.fromISO(activeFarmingStartedAt)
-      .plus({ seconds: farmingDurationInSec + 10 })
-      .setZone("Asia/Jakarta");
-    const waitTime = nextClaimTime.diffNow().as("milliseconds");
-    const hours = Math.floor(waitTime / 1000 / 60 / 60);
-    const minutes = Math.floor((waitTime / 1000 / 60) % 60);
-    console.log(
-      chalk.bgBlackBright(
-        `${getTimestamp()} Akun ke-${
-          index + 1
-        } menunggu ${hours} jam dan ${minutes} menit sebelum klaim...`
-      )
-    );
-    console.log(`-----------------------------`);
-    setTimeout(() => claimReward(token, index), Math.max(0, waitTime));
+      const { activeFarmingStartedAt, farmingDurationInSec } = farmingInfo;
+      const nextClaimTime = DateTime.fromISO(activeFarmingStartedAt)
+        .plus({ seconds: farmingDurationInSec + 10 })
+        .setZone("Asia/Jakarta");
+      const waitTime = nextClaimTime.diffNow().as("milliseconds");
+      const hours = Math.floor(waitTime / 1000 / 60 / 60);
+      const minutes = Math.floor((waitTime / 1000 / 60) % 60);
+      console.log(
+        chalk.bgBlackBright(
+          `${getTimestamp()} Account ${
+            index + 1
+          } waiting ${hours} hours and ${minutes} minutes before claiming...`
+        )
+      );
+      console.log(`-----------------------------`);
+      setTimeout(() => finishFarming(token, index), Math.max(0, waitTime));
+    } else {
+      console.log(
+        chalk.blue(`${getTimestamp()} Starting farming for account ${index + 1}...`)
+      );
+      claimReward(token, index);
+    }
   }
 };
 
@@ -230,7 +273,7 @@ const startClaiming = async () => {
       await new Promise((resolve) => setTimeout(resolve, 5000)); // Delay 5 seconds between each account
     }
     console.log(
-      chalk.blue(`${getTimestamp()} Menunggu 1 jam sebelum memulai kembali...`)
+      chalk.blue(`${getTimestamp()} Waiting 1 hour before starting again...`)
     );
     await new Promise((resolve) => setTimeout(resolve, 60 * 60 * 1000)); // Wait 1 hour before starting again
   }
