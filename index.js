@@ -73,23 +73,18 @@ const getFarmingInfo = async (token) => {
         chalk.green(`${getTimestamp()} Next Claim Time (WIB): ${nextClaimTime}`)
       );
     } else {
-      console.log(
-        chalk.green(`${getTimestamp()} Farming has not started yet`)
-      );
+      console.log(chalk.green(`${getTimestamp()} Farming has not started yet`));
     }
     return { activeFarmingStartedAt, farmingDurationInSec };
   } catch (error) {
     console.log(
-      chalk.red(
-        `${getTimestamp()} Error getting farming info:`,
-        error.message
-      )
+      chalk.red(`${getTimestamp()} Error getting farming info:`, error.message)
     );
     return null;
   }
 };
 
-const claimReward = async (token, index) => {
+const startFarming = async (token, index) => {
   const config = {
     method: "post",
     url: "https://tg-bot-tap.laborx.io/api/v1/farming/start",
@@ -101,22 +96,18 @@ const claimReward = async (token, index) => {
     const response = await axios(config);
     if (response.status === 200) {
       console.log(
-        chalk.green(`${getTimestamp()} Account ${index + 1} successfully claimed`)
-      );
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 403) {
-      console.log(
-        chalk.yellow(`${getTimestamp()} Account ${index + 1} not time to claim yet`)
-      );
-    } else {
-      console.log(
-        chalk.red(
-          `${getTimestamp()} Account ${index + 1} Error:`,
-          error.message
+        chalk.green(
+          `${getTimestamp()} Account ${index + 1} successfully started farming`
         )
       );
     }
+  } catch (error) {
+    console.log(
+      chalk.red(
+        `${getTimestamp()} Account ${index + 1} Error starting farming:`,
+        error.message
+      )
+    );
   }
   console.log(chalk.blue("------------------------------"));
 };
@@ -133,8 +124,11 @@ const finishFarming = async (token, index) => {
     const response = await axios(config);
     if (response.status === 200) {
       console.log(
-        chalk.green(`${getTimestamp()} Account ${index + 1} successfully finished farming`)
+        chalk.green(
+          `${getTimestamp()} Account ${index + 1} successfully finished farming`
+        )
       );
+      setTimeout(() => startFarming(token, index), 3000); // Start farming again after 3 seconds
     }
   } catch (error) {
     console.log(
@@ -168,12 +162,16 @@ const processTasks = async (token, index) => {
           }
         );
         console.log(
-          chalk.green(`${getTimestamp()} Successfully submitted task ${task.title}`)
+          chalk.green(
+            `${getTimestamp()} Successfully submitted task ${task.title}`
+          )
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else if (task.submission.status === "SUBMITTED") {
         console.log(
-          chalk.yellow(`${getTimestamp()} Task ${task.title} cannot be claimed yet`)
+          chalk.yellow(
+            `${getTimestamp()} Task ${task.title} cannot be claimed yet`
+          )
         );
       } else if (task.submission.status === "COMPLETED") {
         await axios.post(
@@ -184,7 +182,9 @@ const processTasks = async (token, index) => {
           }
         );
         console.log(
-          chalk.green(`${getTimestamp()} Successfully claimed task ${task.title}`)
+          chalk.green(
+            `${getTimestamp()} Successfully claimed task ${task.title}`
+          )
         );
         await new Promise((resolve) => setTimeout(resolve, 1000));
       } else if (task.submission.status === "CLAIMED") {
@@ -259,9 +259,11 @@ const runAccount = async (token, index) => {
       setTimeout(() => finishFarming(token, index), Math.max(0, waitTime));
     } else {
       console.log(
-        chalk.blue(`${getTimestamp()} Starting farming for account ${index + 1}...`)
+        chalk.blue(
+          `${getTimestamp()} Starting farming for account ${index + 1}...`
+        )
       );
-      claimReward(token, index);
+      startFarming(token, index);
     }
   }
 };
