@@ -123,7 +123,7 @@ const processTasks = async (token, index) => {
     let allClaimed = true;
 
     for (const task of tasks) {
-      if (!task.submission) {
+      if (!task.submission || task.submission.status === "REJECTED") {
         await axios.post(
           `https://tg-bot-tap.laborx.io/api/v1/tasks/${task.id}/submissions`,
           {},
